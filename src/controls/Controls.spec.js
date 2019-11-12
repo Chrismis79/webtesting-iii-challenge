@@ -25,29 +25,34 @@ test('Buttons rendering correctly', () => {
     getByText(/close gate/i);
 })
 
-test('close gate button triggers toggle close', async ()=> {
-    const toggleClosedMock = jest.fn();
-    const {findByText} = render(
-        <Controls toggleClosed={toggleClosedMock} closed={false}/>
-    );
-    const closeButton = findByText((/close gate/i));
-    await fireEvent(closeButton, {target: closeButton});
+// test('close gate button triggers toggle close', async ()=> {
+//     const toggleClosedMock = jest.fn();
+//     const {findByText} = render(
+//         <Controls toggleClosed={toggleClosedMock} closed={false}/>
+//     );
+//     const closeButton = findByText((/close gate/i));
+//     await fireEvent(closeButton, {target: closeButton});
         
-    expect(toggleClosedMock).toHaveBeenCalled();
-    expect(toggleClosedMock).toHaveBeenCalledTimes(1);
-});
+//     expect(toggleClosedMock).toHaveBeenCalled();
+//     expect(toggleClosedMock).toHaveBeenCalledTimes(1);
+// });
 
-test('Closed button disabled if gate is locked', () => {
-    const locked = true;
-    const closed = false;
-    const toggleLockMock = jest.fn(() => !locked);
-    const toggleClosedMock = jest.fn(() => !closed);
-    const {getByText} = render(
-        <Controls
-        locked={locked}
-        closed={closed}
-        toggleLock={toggleLockMock}
-        toggleClosed={toggleClosedMock} />
-    )
-    expect(getByText(/close gate/i)).
-});
+test("button text changes based on current state", async () => {
+    // const [locked, setLocked] = useState(false);
+    // const [closed, setClosed] = useState(false);
+    let locked = false;
+    let closed = false;
+    const setLocked = () => (locked = !locked);
+    const setClosed = () => (closed = !closed);
+    const controls = render(<Controls closed={closed} locked={locked} />);
+    const lockBtn = controls.getByText("Lock Gate");
+    const closeBtn = controls.getByText("Close Gate");
+    lockBtn.onClick = setLocked((locked) => !locked);
+    closeBtn.onClick = setClosed((closed) => (!closed));
+    expect(lockBtn).toBeDefined;
+    expect(closeBtn).toBeDefined;
+    fireEvent.click(closeBtn);
+    await fireEvent.click(lockBtn);
+    expect(lockBtn).not.toBeDefined;
+    expect(closeBtn).not.toBeDefined;
+})
